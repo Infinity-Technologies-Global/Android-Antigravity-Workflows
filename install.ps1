@@ -2,11 +2,12 @@
 $RepoBase = "https://raw.githubusercontent.com/Infinity-Technologies-Global/Android-Antigravity-Workflows/main"
 
 # Resources
+# WORKFLOWS are now inside 'workflows/' folder in Git
 $Workflows = @(
     "audit.md", "cloudflare-tunnel.md", "code.md", "debug.md", 
     "deploy.md", "init.md", "plan.md", "recap.md", 
     "refactor.md", "reskin.md", "rollback.md", "run.md", 
-    "save_brain.md", "test.md", "visualize.md", "README.md"
+    "save_brain.md", "test.md", "visualize.md"
 )
 $Schemas = @("brain.schema.json", "session.schema.json", "preferences.schema.json")
 $Templates = @("brain.example.json", "session.example.json", "preferences.example.json")
@@ -29,7 +30,7 @@ Write-Host "✅ Workflow Path: $AntigravityGlobal" -ForegroundColor Green
 Write-Host "⏳ Đang tải workflows..." -ForegroundColor Cyan
 foreach ($wf in $Workflows) {
     try {
-        Invoke-WebRequest -Uri "$RepoBase/$wf" -OutFile "$AntigravityGlobal\$wf" -ErrorAction Stop
+        Invoke-WebRequest -Uri "$RepoBase/workflows/$wf" -OutFile "$AntigravityGlobal\$wf" -ErrorAction Stop
         Write-Host "   ✅ $wf" -ForegroundColor Green
     } catch {
         Write-Host "   ❌ $wf" -ForegroundColor Red

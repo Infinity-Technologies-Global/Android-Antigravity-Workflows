@@ -8,7 +8,7 @@ WORKFLOWS=(
     "audit.md" "cloudflare-tunnel.md" "code.md" "debug.md" 
     "deploy.md" "init.md" "plan.md" "recap.md" 
     "refactor.md" "reskin.md" "rollback.md" "run.md" 
-    "save_brain.md" "test.md" "visualize.md" "README.md"
+    "save_brain.md" "test.md" "visualize.md"
 )
 
 # Schemas and Templates
@@ -38,7 +38,8 @@ echo "✅ Workflow Path: $ANTIGRAVITY_GLOBAL"
 echo "⏳ Đang tải workflows..."
 success=0
 for wf in "${WORKFLOWS[@]}"; do
-    if curl -f -s -o "$ANTIGRAVITY_GLOBAL/$wf" "$REPO_BASE/$wf"; then
+    # WORKFLOWS ARE NOW IN 'workflows' COMMAND IN GIT
+    if curl -f -s -o "$ANTIGRAVITY_GLOBAL/$wf" "$REPO_BASE/workflows/$wf"; then
         echo "   ✅ $wf"
         ((success++))
     else
@@ -111,14 +112,10 @@ if [ ! -f "$GEMINI_MD" ]; then
     echo "$AWF_INSTRUCTIONS" > "$GEMINI_MD"
     echo "✅ Đã tạo Global Rules (GEMINI.md)"
 else
-    # Update section: Remove old AWF section if exists and append new
+    # Update section
     if grep -q "AWF - Antigravity Workflow Framework" "$GEMINI_MD"; then
-        # Create temp file without AWF section using sed
-        # Delete from START marker to END marker (or end of file if no end marker)
-        # Using a safer approach: Append if not present, or replace simply
         echo "" # Placeholder
     fi
-    # Simple append for now to ensure robustness
     echo "$AWF_INSTRUCTIONS" >> "$GEMINI_MD"
     echo "✅ Đã cập nhật Global Rules (GEMINI.md)"
 fi
