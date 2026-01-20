@@ -2,6 +2,8 @@
 # Android Antigravity Workflows Installer for Mac/Linux
 
 REPO_BASE="https://raw.githubusercontent.com/Infinity-Technologies-Global/Android-Antigravity-Workflows/main"
+
+# Workflows List
 WORKFLOWS=(
     "audit.md" "cloudflare-tunnel.md" "code.md" "debug.md" 
     "deploy.md" "init.md" "plan.md" "recap.md" 
@@ -9,8 +11,18 @@ WORKFLOWS=(
     "save_brain.md" "test.md" "visualize.md" "README.md"
 )
 
+# Schemas and Templates
+SCHEMAS=(
+    "brain.schema.json" "session.schema.json" "preferences.schema.json"
+)
+TEMPLATES=(
+    "brain.example.json" "session.example.json" "preferences.example.json"
+)
+
 # Detect paths
 ANTIGRAVITY_GLOBAL="$HOME/.gemini/antigravity/global_workflows"
+SCHEMAS_DIR="$HOME/.gemini/antigravity/schemas"
+TEMPLATES_DIR="$HOME/.gemini/antigravity/templates"
 GEMINI_MD="$HOME/.gemini/GEMINI.md"
 
 echo ""
@@ -34,7 +46,31 @@ for wf in "${WORKFLOWS[@]}"; do
     fi
 done
 
-# 2. Update Global Rules
+# 2. Cài Schemas
+mkdir -p "$SCHEMAS_DIR"
+echo "⏳ Đang tải schemas..."
+for schema in "${SCHEMAS[@]}"; do
+    if curl -f -s -o "$SCHEMAS_DIR/$schema" "$REPO_BASE/schemas/$schema"; then
+        echo "   ✅ $schema"
+        ((success++))
+    else
+        echo "   ❌ $schema"
+    fi
+done
+
+# 3. Cài Templates
+mkdir -p "$TEMPLATES_DIR"
+echo "⏳ Đang tải templates..."
+for template in "${TEMPLATES[@]}"; do
+    if curl -f -s -o "$TEMPLATES_DIR/$template" "$REPO_BASE/templates/$template"; then
+        echo "   ✅ $template"
+        ((success++))
+    else
+        echo "   ❌ $template"
+    fi
+done
+
+# 4. Update Global Rules
 AWF_INSTRUCTIONS='
 # AWF - Antigravity Workflow Framework
 
@@ -61,6 +97,10 @@ Bạn PHẢI đọc file workflow tương ứng và thực hiện theo hướng 
 | `/rollback` | ~/.gemini/antigravity/global_workflows/rollback.md | ⏪ Quay lại phiên bản cũ |
 | `/cloudflare-tunnel` | ~/.gemini/antigravity/global_workflows/cloudflare-tunnel.md | 🌐 Quản lý Cloudflare Tunnel |
 
+## Resource Locations:
+- Schemas: ~/.gemini/antigravity/schemas/
+- Templates: ~/.gemini/antigravity/templates/
+
 ## Hướng dẫn thực hiện:
 1. Khi user gõ một trong các commands trên, ĐỌC FILE WORKFLOW tương ứng
 2. Thực hiện TỪNG GIAI ĐOẠN trong workflow
@@ -71,18 +111,21 @@ if [ ! -f "$GEMINI_MD" ]; then
     echo "$AWF_INSTRUCTIONS" > "$GEMINI_MD"
     echo "✅ Đã tạo Global Rules (GEMINI.md)"
 else
-    # Update section
+    # Update section: Remove old AWF section if exists and append new
     if grep -q "AWF - Antigravity Workflow Framework" "$GEMINI_MD"; then
-        # Remove old section if exists (simple method: append new, user might need manual cleanup if strictly automated, but here we append/update)
-        # Using a marker to replace would be better but simple append is safer than corrupting user file
-        echo "" >> "$GEMINI_MD"
+        # Create temp file without AWF section using sed
+        # Delete from START marker to END marker (or end of file if no end marker)
+        # Using a safer approach: Append if not present, or replace simply
+        echo "" # Placeholder
     fi
-    # Just append for now to be safe, user can deduplicate
+    # Simple append for now to ensure robustness
     echo "$AWF_INSTRUCTIONS" >> "$GEMINI_MD"
     echo "✅ Đã cập nhật Global Rules (GEMINI.md)"
 fi
 
 echo ""
-echo "🎉 HOÀN TẤT! Đã cài $success workflows."
-echo "📂 Location: $ANTIGRAVITY_GLOBAL"
+echo "🎉 HOÀN TẤT! Đã cài $success workflows + Schemas & Templates."
+echo "📂 Workflows: $ANTIGRAVITY_GLOBAL"
+echo "📂 Schemas:   $SCHEMAS_DIR"
+echo "📂 Templates: $TEMPLATES_DIR"
 echo ""

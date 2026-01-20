@@ -1,13 +1,20 @@
 # Android Antigravity Workflows Installer for Windows
 $RepoBase = "https://raw.githubusercontent.com/Infinity-Technologies-Global/Android-Antigravity-Workflows/main"
+
+# Resources
 $Workflows = @(
     "audit.md", "cloudflare-tunnel.md", "code.md", "debug.md", 
     "deploy.md", "init.md", "plan.md", "recap.md", 
     "refactor.md", "reskin.md", "rollback.md", "run.md", 
     "save_brain.md", "test.md", "visualize.md", "README.md"
 )
+$Schemas = @("brain.schema.json", "session.schema.json", "preferences.schema.json")
+$Templates = @("brain.example.json", "session.example.json", "preferences.example.json")
 
+# Paths
 $AntigravityGlobal = "$env:USERPROFILE\.gemini\antigravity\global_workflows"
+$SchemasDir = "$env:USERPROFILE\.gemini\antigravity\schemas"
+$TemplatesDir = "$env:USERPROFILE\.gemini\antigravity\templates"
 $GeminiMd = "$env:USERPROFILE\.gemini\GEMINI.md"
 
 Write-Host "╔══════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
@@ -16,9 +23,7 @@ Write-Host "╚═════════════════════�
 Write-Host ""
 
 # 1. Cài Global Workflows
-if (-not (Test-Path $AntigravityGlobal)) {
-    New-Item -ItemType Directory -Force -Path $AntigravityGlobal | Out-Null
-}
+if (-not (Test-Path $AntigravityGlobal)) { New-Item -ItemType Directory -Force -Path $AntigravityGlobal | Out-Null }
 Write-Host "✅ Workflow Path: $AntigravityGlobal" -ForegroundColor Green
 
 Write-Host "⏳ Đang tải workflows..." -ForegroundColor Cyan
@@ -31,7 +36,31 @@ foreach ($wf in $Workflows) {
     }
 }
 
-# 2. Update Global Rules
+# 2. Cài Schemas
+if (-not (Test-Path $SchemasDir)) { New-Item -ItemType Directory -Force -Path $SchemasDir | Out-Null }
+Write-Host "⏳ Đang tải schemas..." -ForegroundColor Cyan
+foreach ($schema in $Schemas) {
+    try {
+        Invoke-WebRequest -Uri "$RepoBase/schemas/$schema" -OutFile "$SchemasDir\$schema" -ErrorAction Stop
+        Write-Host "   ✅ $schema" -ForegroundColor Green
+    } catch {
+        Write-Host "   ❌ $schema" -ForegroundColor Red
+    }
+}
+
+# 3. Cài Templates
+if (-not (Test-Path $TemplatesDir)) { New-Item -ItemType Directory -Force -Path $TemplatesDir | Out-Null }
+Write-Host "⏳ Đang tải templates..." -ForegroundColor Cyan
+foreach ($item in $Templates) {
+    try {
+        Invoke-WebRequest -Uri "$RepoBase/templates/$item" -OutFile "$TemplatesDir\$item" -ErrorAction Stop
+        Write-Host "   ✅ $item" -ForegroundColor Green
+    } catch {
+        Write-Host "   ❌ $item" -ForegroundColor Red
+    }
+}
+
+# 4. Update Global Rules
 $AwfInstructions = @"
 # AWF - Antigravity Workflow Framework
 
@@ -58,6 +87,10 @@ Bạn PHẢI đọc file workflow tương ứng và thực hiện theo hướng 
 | ``/rollback`` | ~/.gemini/antigravity/global_workflows/rollback.md | ⏪ Quay lại phiên bản cũ |
 | ``/cloudflare-tunnel`` | ~/.gemini/antigravity/global_workflows/cloudflare-tunnel.md | 🌐 Quản lý Cloudflare Tunnel |
 
+## Resource Locations:
+- Schemas: ~/.gemini/antigravity/schemas/
+- Templates: ~/.gemini/antigravity/templates/
+
 ## Hướng dẫn thực hiện:
 1. Khi user gõ một trong các commands trên, ĐỌC FILE WORKFLOW tương ứng
 2. Thực hiện TỪNG GIAI ĐOẠN trong workflow
@@ -73,6 +106,6 @@ if (-not (Test-Path $GeminiMd)) {
 }
 
 Write-Host ""
-Write-Host "🎉 HOÀN TẤT! Đã cài workflows." -ForegroundColor Yellow
+Write-Host "🎉 HOÀN TẤT! Đã cài workflows + resources." -ForegroundColor Yellow
 Write-Host "📂 Location: $AntigravityGlobal" -ForegroundColor Cyan
 Write-Host ""
