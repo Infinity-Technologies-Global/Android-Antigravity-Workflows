@@ -2,19 +2,23 @@
 
 Bộ workflows chuẩn hóa cho Antigravity Agent, giúp tự động hóa quy trình phát triển ứng dụng Android tại Infinity Technologies Global.
 
-## 📥 Cài đặt (Build Workflows)
+## 📥 Cài đặt nhanh
 
-Để cài đặt bộ workflows này cho Antigravity của bạn, hãy chạy lệnh sau:
+### 🍎 Mac / Linux
+Chạy lệnh sau trong Terminal:
 
 ```bash
-# Backup workflows cũ (nếu có)
-mv ~/.gemini/antigravity/global_workflows ~/.gemini/antigravity/global_workflows_backup_$(date +%s) 2>/dev/null || true
-
-# Clone workflows mới
-git clone git@github.com:Infinity-Technologies-Global/Android-Antigravity-Workflows.git ~/.gemini/antigravity/global_workflows
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Infinity-Technologies-Global/Android-Antigravity-Workflows/main/install.sh)"
 ```
 
-Sau khi chạy xong, restart Antigravity hoặc IDE để workflows mới có hiệu lực.
+### 🪟 Windows (PowerShell)
+Chạy lệnh sau trong PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/Infinity-Technologies-Global/Android-Antigravity-Workflows/main/install.ps1 | iex
+```
+
+Sau khi cài đặt xong, hãy restart Antigravity hoặc IDE để workflows có hiệu lực.
 
 ## 🎨 Hướng dẫn Reskin (/reskin)
 

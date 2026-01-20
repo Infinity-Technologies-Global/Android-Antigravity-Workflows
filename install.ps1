@@ -1,0 +1,78 @@
+# Android Antigravity Workflows Installer for Windows
+$RepoBase = "https://raw.githubusercontent.com/Infinity-Technologies-Global/Android-Antigravity-Workflows/main"
+$Workflows = @(
+    "audit.md", "cloudflare-tunnel.md", "code.md", "debug.md", 
+    "deploy.md", "init.md", "plan.md", "recap.md", 
+    "refactor.md", "reskin.md", "rollback.md", "run.md", 
+    "save_brain.md", "test.md", "visualize.md", "README.md"
+)
+
+$AntigravityGlobal = "$env:USERPROFILE\.gemini\antigravity\global_workflows"
+$GeminiMd = "$env:USERPROFILE\.gemini\GEMINI.md"
+
+Write-Host "╔══════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "║   🚀 Android Antigravity Workflows Installer             ║" -ForegroundColor Cyan
+Write-Host "╚══════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host ""
+
+# 1. Cài Global Workflows
+if (-not (Test-Path $AntigravityGlobal)) {
+    New-Item -ItemType Directory -Force -Path $AntigravityGlobal | Out-Null
+}
+Write-Host "✅ Workflow Path: $AntigravityGlobal" -ForegroundColor Green
+
+Write-Host "⏳ Đang tải workflows..." -ForegroundColor Cyan
+foreach ($wf in $Workflows) {
+    try {
+        Invoke-WebRequest -Uri "$RepoBase/$wf" -OutFile "$AntigravityGlobal\$wf" -ErrorAction Stop
+        Write-Host "   ✅ $wf" -ForegroundColor Green
+    } catch {
+        Write-Host "   ❌ $wf" -ForegroundColor Red
+    }
+}
+
+# 2. Update Global Rules
+$AwfInstructions = @"
+# AWF - Antigravity Workflow Framework
+
+## CRITICAL: Command Recognition
+Khi user gõ các lệnh bắt đầu bằng ``/`` dưới đây, đây là AWF WORKFLOW COMMANDS.
+Bạn PHẢI đọc file workflow tương ứng và thực hiện theo hướng dẫn trong đó.
+
+## Command Mapping (QUAN TRỌNG):
+| Command | Workflow File | Mô tả |
+|---------|--------------|-------|
+| ``/reskin`` | ~/.gemini/antigravity/global_workflows/reskin.md | 🎨 Reskin ứng dụng Android |
+| ``/plan`` | ~/.gemini/antigravity/global_workflows/plan.md | 📝 Thiết kế tính năng |
+| ``/code`` | ~/.gemini/antigravity/global_workflows/code.md | 💻 Viết code theo Spec |
+| ``/visualize`` | ~/.gemini/antigravity/global_workflows/visualize.md | 🎨 Thiết kế giao diện |
+| ``/debug`` | ~/.gemini/antigravity/global_workflows/debug.md | 🐞 Sửa lỗi & Debug |
+| ``/test`` | ~/.gemini/antigravity/global_workflows/test.md | ✅ Chạy kiểm thử |
+| ``/run`` | ~/.gemini/antigravity/global_workflows/run.md | ▶️ Chạy ứng dụng |
+| ``/deploy`` | ~/.gemini/antigravity/global_workflows/deploy.md | 🚀 Deploy lên Production |
+| ``/init`` | ~/.gemini/antigravity/global_workflows/init.md | ✨ Tạo dự án mới |
+| ``/recap`` | ~/.gemini/antigravity/global_workflows/recap.md | 🧠 Tóm tắt dự án |
+| ``/save-brain`` | ~/.gemini/antigravity/global_workflows/save_brain.md | 💾 Lưu kiến thức dự án |
+| ``/audit`` | ~/.gemini/antigravity/global_workflows/audit.md | 🏥 Kiểm tra code & bảo mật |
+| ``/refactor`` | ~/.gemini/antigravity/global_workflows/refactor.md | 🧹 Dọn dẹp & tối ưu code |
+| ``/rollback`` | ~/.gemini/antigravity/global_workflows/rollback.md | ⏪ Quay lại phiên bản cũ |
+| ``/cloudflare-tunnel`` | ~/.gemini/antigravity/global_workflows/cloudflare-tunnel.md | 🌐 Quản lý Cloudflare Tunnel |
+
+## Hướng dẫn thực hiện:
+1. Khi user gõ một trong các commands trên, ĐỌC FILE WORKFLOW tương ứng
+2. Thực hiện TỪNG GIAI ĐOẠN trong workflow
+3. KHÔNG tự ý bỏ qua bước nào
+"@
+
+if (-not (Test-Path $GeminiMd)) {
+    Set-Content -Path $GeminiMd -Value $AwfInstructions -Encoding UTF8
+    Write-Host "✅ Đã tạo Global Rules (GEMINI.md)" -ForegroundColor Green
+} else {
+    Add-Content -Path $GeminiMd -Value "`n$AwfInstructions" -Encoding UTF8
+    Write-Host "✅ Đã cập nhật Global Rules (GEMINI.md)" -ForegroundColor Green
+}
+
+Write-Host ""
+Write-Host "🎉 HOÀN TẤT! Đã cài workflows." -ForegroundColor Yellow
+Write-Host "📂 Location: $AntigravityGlobal" -ForegroundColor Cyan
+Write-Host ""
