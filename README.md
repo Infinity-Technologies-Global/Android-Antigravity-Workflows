@@ -78,5 +78,3 @@ Facebook Client Token: a1b2c3d4e5f6g7h8
 **Ynsuper**
 <br>
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-yellow.svg)](https://buymeacoffee.com/ynsuper)
-<br>
-[https://buymeacoffee.com/ynsuper](https://buymeacoffee.com/ynsuper)
