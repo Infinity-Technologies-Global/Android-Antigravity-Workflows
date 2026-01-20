@@ -67,3 +67,16 @@ Facebook Client Token: a1b2c3d4e5f6g7h8
 - **/test**: ✅ Chạy kiểm thử
 - **/visualize**: 🎨 Thiết kế giao diện
 - **/cloudflare-tunnel**: 🌐 Quản lý Cloudflare Tunnel
+
+## 🗺️ Roadmap (Phiên bản tiếp theo)
+
+- [ ] **/implementation_ads**: 💰 Tự động gắn quảng cáo (AdMob, Applovin, etc.) vào code theo kịch bản có sẵn.
+- [ ] **/change_icon**: 🖼️ Tự động resize và thay đổi icon app cho tất cả các mật độ màn hình (mipmap/drawable).
+
+## ☕ Tác giả
+
+**Ynsuper**
+<br>
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-yellow.svg)](https://buymeacoffee.com/ynsuper)
+<br>
+[https://buymeacoffee.com/ynsuper](https://buymeacoffee.com/ynsuper)
