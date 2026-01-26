@@ -104,9 +104,29 @@ Follow this process for optimal results (Tuân thủ quy trình này để đạ
 - **/visualize**: 🎨 Thiết kế giao diện
 - **/cloudflare-tunnel**: 🌐 Quản lý Cloudflare Tunnel
 
+## 💰 Tự động gán quảng cáo (/implementation_ad)
+
+Workflow hỗ trợ tự động tích hợp quảng cáo vào dự án Android (AdMob).
+
+### Cách dùng:
+Gõ lệnh sau vào chat hoặc dùng lệnh `/implementation_ad`:
+
+```text
+/implementation_ad
+interstitial inter_splash ca-app-pub-xxx/yyy
+banner banner_splash ca-app-pub-xxx/zzz
+native native_home ca-app-pub-xxx/aaa
+```
+
+#### Chức năng:
+1. **Cập nhật Config**: Tự động điền Real ID vào `ad_config.json` và Test ID Google vào `ad_config_debug.json`.
+2. **Setup Code**: Tự động sinh code Kotlin cho `AdsManager`, `AdRemoteConfig` dựa trên các key mà bạn cung cấp.
+
+---
+
 ## 🗺️ Roadmap (Phiên bản tiếp theo)
 
-- [ ] **/implementation_ads**: 💰 Tự động gắn quảng cáo (AdMob, Applovin, etc.) vào code theo kịch bản có sẵn.
+- [x] **/implementation_ads**: 💰 Tự động gắn quảng cáo (AdMob, Applovin, etc.) vào code theo kịch bản có sẵn.
 - [ ] **/change_icon**: 🖼️ Tự động resize và thay đổi icon app cho tất cả các mật độ màn hình (mipmap/drawable).
 
 ## ☕ Tác giả
