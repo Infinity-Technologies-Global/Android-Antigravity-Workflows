@@ -61,7 +61,41 @@ foreach ($item in $Templates) {
     }
 }
 
-# 4. Update Global Rules
+# 4. Cài Skills
+$Skills = @("implementation_ad")
+$SkillsDir = "$env:USERPROFILE\.gemini\antigravity\skills"
+
+Write-Host "⏳ Đang tải skills..." -ForegroundColor Cyan
+foreach ($skill in $Skills) {
+    $TargetSkillDir = "$SkillsDir\$skill"
+    $TargetImplDir = "$TargetSkillDir\implementation"
+    
+    if (-not (Test-Path $TargetImplDir)) { New-Item -ItemType Directory -Force -Path $TargetImplDir | Out-Null }
+
+    # Download SKILL.md
+    try {
+        Invoke-WebRequest -Uri "$RepoBase/skills/$skill/SKILL.md" -OutFile "$TargetSkillDir\SKILL.md" -ErrorAction Stop
+        Write-Host "   ✅ $skill (SKILL.md)" -ForegroundColor Green
+    } catch {
+        Write-Host "   ❌ $skill (SKILL.md)" -ForegroundColor Red
+    }
+
+    # Download implementation files
+    $Files = @("AdsManager.kt", "AdRemoteConfig.kt", "AdRemoteConfigExtensions.kt")
+    foreach ($f in $Files) {
+        try {
+            Invoke-WebRequest -Uri "$RepoBase/skills/$skill/implementation/$f" -OutFile "$TargetImplDir\$f" -ErrorAction SilentlyContinue
+        } catch {
+            # Implementation file might not exist, ignore
+        }
+    }
+
+    # Download Install Scripts for future ref
+    try { Invoke-WebRequest -Uri "$RepoBase/skills/$skill/install.sh" -OutFile "$TargetSkillDir\install.sh" -ErrorAction SilentlyContinue } catch {}
+    try { Invoke-WebRequest -Uri "$RepoBase/skills/$skill/install.ps1" -OutFile "$TargetSkillDir\install.ps1" -ErrorAction SilentlyContinue } catch {}
+}
+
+# 5. Update Global Rules
 $AwfInstructions = @"
 # AWF - Antigravity Workflow Framework
 
@@ -87,6 +121,7 @@ Bạn PHẢI đọc file workflow tương ứng và thực hiện theo hướng 
 | ``/refactor`` | ~/.gemini/antigravity/global_workflows/refactor.md | 🧹 Dọn dẹp & tối ưu code |
 | ``/rollback`` | ~/.gemini/antigravity/global_workflows/rollback.md | ⏪ Quay lại phiên bản cũ |
 | ``/cloudflare-tunnel`` | ~/.gemini/antigravity/global_workflows/cloudflare-tunnel.md | 🌐 Quản lý Cloudflare Tunnel |
+| ``/implementation_ad`` | ~/.gemini/antigravity/skills/implementation_ad/SKILL.md | 💰 Tự động gán quảng cáo |
 
 ## Resource Locations:
 - Schemas: ~/.gemini/antigravity/schemas/
