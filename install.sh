@@ -71,7 +71,46 @@ for template in "${TEMPLATES[@]}"; do
     fi
 done
 
-# 4. Update Global Rules
+# 4. Cài Skills
+SKILLS=("implementation_ad")
+SKILLS_DIR="$HOME/.gemini/antigravity/skills"
+
+echo "⏳ Đang tải skills..."
+for skill in "${SKILLS[@]}"; do
+    TARGET_SKILL_DIR="$SKILLS_DIR/$skill"
+    TARGET_IMPL_DIR="$TARGET_SKILL_DIR/implementation"
+    mkdir -p "$TARGET_IMPL_DIR"
+    
+    # Download SKILL.md
+    if curl -f -s -o "$TARGET_SKILL_DIR/SKILL.md" "$REPO_BASE/skills/$skill/SKILL.md"; then
+        echo "   ✅ $skill (SKILL.md)"
+        ((success++))
+    else
+        echo "   ❌ $skill (SKILL.md)"
+    fi
+    
+    # Download implementation files
+    # Note: We need to know specific files or have a way to list them. 
+    # For now, hardcoding the known files for implementation_ad is safest without directory listing API on raw github.
+    # OR simpler: just download the install script and run it? No, repo structure is raw files.
+    # Let's download the critical files we know exist.
+    
+    FILES=( "AdsManager.kt" "AdRemoteConfig.kt" "AdRemoteConfigExtensions.kt" )
+    for f in "${FILES[@]}"; do
+        if curl -f -s -o "$TARGET_IMPL_DIR/$f" "$REPO_BASE/skills/$skill/implementation/$f"; then
+             # echo "      - $f" 
+             true
+        fi
+    done
+    
+    # Download Install Scripts for future ref
+    curl -f -s -o "$TARGET_SKILL_DIR/install.sh" "$REPO_BASE/skills/$skill/install.sh"
+    curl -f -s -o "$TARGET_SKILL_DIR/install.ps1" "$REPO_BASE/skills/$skill/install.ps1"
+    chmod +x "$TARGET_SKILL_DIR/install.sh"
+done
+
+
+# 5. Update Global Rules
 AWF_INSTRUCTIONS='
 # AWF - Antigravity Workflow Framework
 
