@@ -5,8 +5,20 @@ description: Automates ad integration with complete logic. Updates JSON configs 
 
 # Implementation Ad Skill
 
-Use this skill when the user provides ad IDs (Excel/Text) and requests integration.
-**Requirement**: The agent MUST write the **complete logic** (Code) for the user, not just references.
+# Usage
+To use this skill, simply request the implementation of ads and provide the list of Ad IDs (Real).
+
+**Example Prompt:**
+> "Please implement ads using the following list:
+> interstitial inter_splash ca-app-pub-xxx/yyy
+> native native_home ca-app-pub-xxx/zzz"
+
+or use the command:
+> `/implementation_ad <list_of_ads>`
+
+The Agent will automatically:
+1.  Update `ad_config.json` (Real IDs) and `ad_config_debug.json` (Test IDs).
+2.  Generate Kotlin code for `AdRemoteConfig`, `AdsManager`, and Activities based on the templates in `implementation/`.
 
 ## 1. Update Configuration (JSON)
 1.  **Parse User Input**: Extract Key (e.g., `native_home`), Type (e.g., `native`), and Real ID.
