@@ -136,6 +136,7 @@ Bạn PHẢI đọc file workflow tương ứng và thực hiện theo hướng 
 | `/refactor` | ~/.gemini/antigravity/global_workflows/refactor.md | 🧹 Dọn dẹp & tối ưu code |
 | `/rollback` | ~/.gemini/antigravity/global_workflows/rollback.md | ⏪ Quay lại phiên bản cũ |
 | `/cloudflare-tunnel` | ~/.gemini/antigravity/global_workflows/cloudflare-tunnel.md | 🌐 Quản lý Cloudflare Tunnel |
+| `/implementation_ad` | ~/.gemini/antigravity/skills/implementation_ad/SKILL.md | 💰 Tự động gán quảng cáo |
 
 ## Resource Locations:
 - Schemas: ~/.gemini/antigravity/schemas/
