@@ -1,5 +1,5 @@
 ---
-description: 🎨 Reskin ứng dụng Android (Full) - Phân tích UI, Design System, Đổi Package/Name/Ads, Reskin Drawable & PNG, Icon App, Lint & Build
+description: 🎨 Reskin ứng dụng Android (Full) - Phân tích UI, Design System, Đổi Package/Name/Ads, Reskin Drawable & PNG, Kiểm tra bản quyền, Xóa nền (rembg), Icon App, Lint & Build
 ---
 
 # 🎨 Workflow Reskin Ứng Dụng Android (Full Edition)
@@ -228,6 +228,151 @@ Với **MỖI PNG** cần reskin:
 
 ---
 
+# 🛡️ PHẦN 3.5: KIỂM TRA BẢN QUYỀN ẢNH (Copyright Audit)
+
+## 📋 Bước 7.5: Quét và xử lý ảnh vi phạm bản quyền
+
+> **⚠️ QUAN TRỌNG**: Bước này **BẮT BUỘC** để tránh bị takedown trên Google Play do vi phạm bản quyền.
+
+### 7.5.1. Quét toàn bộ ảnh trong drawable
+
+Agent xem **từng file ảnh** (`*.png`, `*.webp`) trong tất cả các thư mục drawable bằng `view_file` và kiểm tra:
+
+**Danh sách vi phạm cần tìm:**
+- **Nintendo**: Logo, text "Nintendo", "GAME BOY", "GAME BOY ADVANCE", "NINTENDO DS", "SUPER NINTENDO", "FAMICOM", "N64"
+- **Mario**: Mario, Luigi, Peach, Yoshi, Toad, Goomba, Koopa, Bowser, Mario mushroom (nấm đỏ/xanh), Mario star (ngôi sao có mắt), Mario coin, Mario pipe (ống xanh), Mario question block (?), Mario fire flower
+- **Pac-Man**: Pac-Man, ghosts (Blinky, Pinky, Inky, Clyde)
+- **Các IP khác**: Sonic, Pokémon, Zelda, Kirby, Mega Man, Tetris
+- **Thiết bị có brand**: Game Boy shape rõ ràng, NDS shape, SNES controller shape cụ thể
+
+**Cách kiểm tra:**
+```
+Với mỗi file ảnh:
+1. view_file để xem nội dung ảnh
+2. Phân loại: ✅ SAFE / ⚠️ BORDERLINE / ❌ VIOLATION
+3. Nếu VIOLATION: Ghi nhận tên file + lý do
+```
+
+### 7.5.2. Regenerate ảnh vi phạm
+
+Với mỗi ảnh bị đánh dấu **❌ VIOLATION**:
+
+1. **Xác định mục đích** của ảnh gốc (icon console, tutorial, decoration, v.v.)
+2. **Tạo prompt cho generate_image** theo nguyên tắc:
+   ```
+   Prompt = "3D rendered [mô tả chức năng ảnh], [THEME] colors,
+   NO brand names NO logos NO text NO copyrighted characters,
+   generic design, white clean background,
+   high quality 3D claymation style render"
+   ```
+
+   **Quy tắc prompt:**
+   - Console icons → Dùng "generic portable/home gaming console/device" thay vì tên cụ thể
+   - KHÔNG dùng: "Nintendo", "Game Boy", "Mario", "Pac-Man", "SNES", "NDS", "Famicom"
+   - KHÔNG dùng: "mushroom with eyes", "star with face", "question mark block"
+   - Thay bằng: generic game controller, abstract game cartridge, simple geometric shapes
+
+3. **Generate ảnh mới** bằng `generate_image`
+4. **Copy ghi đè** vào đúng vị trí file cũ
+
+### 7.5.3. Tạo báo cáo bản quyền
+
+Agent tạo bảng tổng kết:
+
+| # | File | Vấn đề | Trạng thái |
+|---|------|--------|-----------|
+| 1 | `ic_gba.webp` | "GAME BOY ADVANCE" text, Mario characters | ✅ Đã thay thế |
+| 2 | `ic_nes.webp` | "FAMICOM", "SUPER MARIO BROS" text | ✅ Đã thay thế |
+| ... | ... | ... | ... |
+
+---
+
+# 🧹 PHẦN 3.6: XÓA NỀN ẢNH (Background Removal)
+
+## 📋 Bước 7.6: Xóa nền cho tất cả ảnh drawable
+
+> **⚠️ YÊU CẦU**: Phải cài `rembg` trước khi chạy bước này.
+
+### 7.6.1. Kiểm tra và cài đặt rembg
+
+```bash
+# Kiểm tra đã cài chưa
+python3 -c "from rembg import remove; print('✅ rembg OK')" 2>/dev/null
+
+# Nếu chưa cài, chạy:
+python3 -m pip install "rembg[cli]" Pillow
+```
+
+> **Lưu ý**: Phải cài `rembg[cli]` (có `[cli]`) để có đầy đủ CLI. Nếu dùng Python 3.9 (macOS system), có thể gặp lỗi `numba`/`gradio`. Giải pháp:
+> - Cài Python 3.12+: `brew install python@3.12` rồi dùng `python3.12`
+> - Hoặc dùng script Python trực tiếp (bỏ qua CLI, xem bên dưới)
+
+### 7.6.2. Tạo script xóa nền (tương thích mọi Python version)
+
+```bash
+cat > /tmp/remove_bg.py << 'SCRIPT'
+import sys, os, io
+
+# Bypass gradio import issue (Python 3.9 compatibility)
+sys.modules['gradio'] = type(sys)('gradio')
+
+from rembg import remove
+from PIL import Image
+
+input_dir = sys.argv[1]
+files = [f for f in os.listdir(input_dir) if f.endswith(('.webp', '.png')) and not f.startswith('.')]
+total = len(files)
+
+for i, f in enumerate(files, 1):
+    path = os.path.join(input_dir, f)
+    print(f"[{i}/{total}] {f}...", flush=True)
+    try:
+        with open(path, 'rb') as inp:
+            result = remove(inp.read())
+        ext = f.rsplit('.', 1)[-1].upper()
+        if ext == 'WEBP':
+            Image.open(io.BytesIO(result)).save(path, 'WEBP')
+        else:
+            with open(path, 'wb') as out:
+                out.write(result)
+        print(f"  ✅ OK")
+    except Exception as e:
+        print(f"  ❌ Error: {e}")
+
+print(f"\n🎉 Done! Processed {total} files.")
+SCRIPT
+```
+
+### 7.6.3. Chạy xóa nền cho tất cả drawable directories
+
+```bash
+# Xóa nền cho designsystem drawable (nếu có)
+if [ -d "[PROJECT_ROOT]/core/designsystem/src/main/res/drawable" ]; then
+  echo "📂 Processing designsystem drawable..."
+  python3 /tmp/remove_bg.py [PROJECT_ROOT]/core/designsystem/src/main/res/drawable
+fi
+
+# Xóa nền cho app drawable
+if [ -d "[PROJECT_ROOT]/app/src/main/res/drawable" ]; then
+  echo "📂 Processing app drawable..."
+  python3 /tmp/remove_bg.py [PROJECT_ROOT]/app/src/main/res/drawable
+fi
+
+# Xóa nền cho các module drawable khác (nếu có)
+find [PROJECT_ROOT] -path "*/src/main/res/drawable" -type d | while read dir; do
+  echo "📂 Processing $dir..."
+  python3 /tmp/remove_bg.py "$dir"
+done
+```
+
+> **⚠️ Lưu ý:**
+> - Lần chạy đầu tiên sẽ tải model `u2net.onnx` (~176MB), lưu tại `~/.u2net/`
+> - Mỗi ảnh mất ~5-15 giây tùy kích thước
+> - Ảnh đã có nền trong suốt sẽ giữ nguyên (không bị hỏng)
+> - Không xóa nền cho ảnh XML drawable (chỉ PNG/WebP)
+
+---
+
 # 🏷️ PHẦN 4: TẠO APP ICON
 
 ## 📋 Bước 8: Tạo và thay thế App Icon
@@ -441,6 +586,8 @@ Tạo báo cáo tổng kết cho người dùng gồm:
 | 🎨 Design System     | [Số color tokens] colors defined      |
 | 🖌️ Drawable XML      | [Số file] files updated               |
 | 🖼️ PNG Images         | [Số file] images regenerated          |
+| 🛡️ Copyright Audit   | [Số ảnh vi phạm] found → replaced     |
+| 🧹 Background Remove | [Số ảnh] processed with rembg          |
 | 🏷️ App Icon           | ✅ All densities created              |
 | 🔧 Ads               | [Updated / Skipped]                   |
 | ✅ Build              | [Success / Failed with details]       |
