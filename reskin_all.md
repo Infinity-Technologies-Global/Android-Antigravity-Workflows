@@ -9,6 +9,66 @@ Workflow reskin toàn diện cho ứng dụng Android.
 
 ---
 
+## 🔎 Bước 0: Kiểm tra điều kiện chạy (Prerequisites Check)
+
+> **⚠️ BẮT BUỘC**: Phải pass TẤT CẢ kiểm tra trước khi tiếp tục. Nếu fail → thông báo user và DỪNG LẠI.
+
+### 0.1. Kiểm tra Android Project
+```bash
+cd [PROJECT_ROOT]
+
+# Phải có build.gradle hoặc build.gradle.kts
+ls app/build.gradle* 2>/dev/null || echo "❌ FAIL: Không tìm thấy app/build.gradle"
+
+# Phải có AndroidManifest.xml
+ls app/src/main/AndroidManifest.xml 2>/dev/null || echo "❌ FAIL: Không tìm thấy AndroidManifest.xml"
+
+# Phải có res/values/
+ls app/src/main/res/values/ 2>/dev/null || echo "❌ FAIL: Không tìm thấy res/values/"
+```
+
+### 0.2. Kiểm tra Git
+```bash
+git --version 2>/dev/null || echo "❌ FAIL: Git chưa cài"
+```
+
+### 0.3. Kiểm tra rembg (cho xóa nền)
+```bash
+python3 -c "from rembg import remove; print('✅ rembg OK')" 2>/dev/null || echo "⚠️ WARN: rembg chưa cài — bỏ qua bước xóa nền. Cài bằng: pip install 'rembg[cli]' Pillow"
+```
+
+### 0.4. Kiểm tra sips (resize icon - macOS)
+```bash
+which sips 2>/dev/null && echo "✅ sips OK" || echo "⚠️ WARN: sips không có — dùng cách khác để resize icon"
+```
+
+### 0.5. Kiểm tra Gradle Wrapper
+```bash
+ls [PROJECT_ROOT]/gradlew 2>/dev/null && echo "✅ gradlew OK" || echo "⚠️ WARN: gradlew không có — bỏ qua bước Lint & Build"
+```
+
+### 0.6. Kiểm tra generate_image tool
+Agent tự kiểm tra: tool `generate_image` có sẵn hay không. Nếu không → thông báo user.
+
+### 0.7. Tổng kết Prerequisites
+
+Agent tạo bảng kết quả:
+
+| # | Thành phần | Trạng thái | Ghi chú |
+|---|-----------|:----------:|---------|
+| 1 | Android Project | ✅/❌ | build.gradle + AndroidManifest |
+| 2 | Git | ✅/❌ | Backup & commit |
+| 3 | rembg | ✅/⚠️ | Xóa nền (optional) |
+| 4 | sips | ✅/⚠️ | Resize icon (macOS) |
+| 5 | gradlew | ✅/⚠️ | Lint & Build (optional) |
+| 6 | generate_image | ✅/❌ | Gen ảnh PNG + Icon |
+
+**Quy tắc:**
+- ❌ ở mục 1, 2, 6 → **DỪNG LẠI**, yêu cầu user fix
+- ⚠️ ở mục 3, 4, 5 → **Tiếp tục**, bỏ qua bước tương ứng
+
+---
+
 ## 📋 Bước 1: Thu thập thông tin
 
 Yêu cầu người dùng cung cấp **CHỦ ĐỀ / THEME** cho ứng dụng reskin (ví dụ: "Galaxy Space", "Nature Green", "Neon Cyber").
@@ -202,7 +262,13 @@ Agent phân loại PNG thành các nhóm:
 
 ### 7.3. Tạo ảnh mới bằng generate_image
 
-Với **MỖI PNG** cần reskin:
+> **🌐 BỎ QUA các icon ngôn ngữ/quốc kỳ — KHÔNG reskin:**
+> - `ic_flag_*`, `flag_*`, `ic_lang_*`, `ic_language_*`
+> - ISO codes: `ic_en`, `ic_vi`, `ic_ja`, `ic_ko`, `ic_zh`, `ic_fr`, `ic_de`, `ic_es`, `ic_pt`, `ic_ru`, `ic_ar`, `ic_hi`, `ic_th`, `ic_id`, `ic_ms`, `ic_tr`, `ic_pl`, `ic_nl`, `ic_sv`, `ic_da`, `ic_fi`, `ic_nb`, `ic_cs`, `ic_hu`, `ic_ro`, `ic_uk`, `ic_he`, `ic_bn`, `ic_ta`, `ic_te`, `ic_mr`
+> - Country/language names: `ic_brazil`, `ic_english`, `ic_french`, `ic_german`, `ic_spanish`, `ic_portuguese`, `ic_russian`, `ic_chinese`, `ic_japanese`, `ic_korean`, `ic_vietnamese`, `ic_thai`, `ic_arabic`, `ic_hindi`, `ic_indonesian`, `ic_turkish`, `ic_italian`, `ic_dutch`, `ic_swedish`, `ic_polish`, `ic_czech`, `ic_hungarian`, `ic_romanian`, `ic_greek`, `ic_hebrew`, `ic_persian`, `ic_bengali`, `ic_tamil`, `ic_telugu`, `ic_marathi`, `ic_filipino`, `ic_malay`, v.v.
+> - Các tên kết thúc bằng `_flag`, `_language`
+
+Với **MỖI PNG** cần reskin (trừ các icon ngôn ngữ trên):
 
 1. **Xem ảnh gốc** bằng `view_file` để hiểu nội dung
 2. **Tạo prompt cho generate_image** theo công thức:
